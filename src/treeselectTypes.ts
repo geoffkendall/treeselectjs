@@ -58,6 +58,8 @@ export interface ITreeselect {
   nameChangeCallback: ((name: string) => void) | undefined
   searchCallback: ((value: string) => void) | undefined
   openCloseGroupCallback: ((groupId: ValueOptionType, isClosed: boolean) => void) | undefined
+  onTagEnter: ((value: ValueOptionType) => void) | undefined //GK
+  onTagLeave: ((value: ValueOptionType) => void) | undefined //GK
   mount: () => void
   updateValue: (newValue: ValueInputType) => void
   destroy: () => void
@@ -102,6 +104,8 @@ export interface ITreeselectParams {
   nameChangeCallback?: (name: string) => void
   searchCallback?: (value: string) => void
   openCloseGroupCallback?: (groupId: ValueOptionType, isClosed: boolean) => void
+  onTagEnter?: (value: ValueOptionType) => void //GK
+  onTagLeave?: (value: ValueOptionType) => void //GK
 }
 
 export type FlattedOptionType = {
@@ -115,6 +119,7 @@ export type FlattedOptionType = {
   isClosed: boolean
   hidden: boolean
   disabled: boolean
+  htmlAttrStr: string //GK
 }
 
 export type IconsType = {

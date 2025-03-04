@@ -220,7 +220,8 @@ const getArrowOfItemByCheckbox = (checkbox: HTMLElement | Element) => {
   return arrow
 }
 
-const setAttributesFromHtmlAttr = (itemElement: HTMLDivElement, htmlAttr?: object) => {
+// GK
+export const setAttributesFromHtmlAttr = (itemElement: HTMLDivElement, htmlAttr?: object) => {
   if (!htmlAttr) {
     return
   }
@@ -262,6 +263,8 @@ export class TreeselectList implements ITreeselectList {
   inputCallback: (value: SelectedNodesType) => void
   arrowClickCallback: (groupId: ValueOptionType, isClosed: boolean) => void
   mouseupCallback: () => void
+  onTagEnterCallback?: (value: ValueOptionType) => void //GK
+  onTagLeaveCallback?: (value: ValueOptionType) => void //GK
 
   // PrivateInnerState
   #lastFocusedItem: HTMLElement | null = null
@@ -286,7 +289,9 @@ export class TreeselectList implements ITreeselectList {
     listClassName,
     inputCallback,
     arrowClickCallback,
-    mouseupCallback
+    mouseupCallback,
+    onTagEnterCallback, //GK
+    onTagLeaveCallback  //GK
   }: ITreeselectListParams) {
     this.options = options
     this.value = value
@@ -312,6 +317,8 @@ export class TreeselectList implements ITreeselectList {
     this.inputCallback = inputCallback
     this.arrowClickCallback = arrowClickCallback
     this.mouseupCallback = mouseupCallback
+    this.onTagEnterCallback = onTagEnterCallback //GK
+    this.onTagLeaveCallback = onTagLeaveCallback //GK
 
     validateOptions(this.flattedOptions)
   }
@@ -466,6 +473,28 @@ export class TreeselectList implements ITreeselectList {
       const isDefaultIndex = !allCheckboxes[nextNodeIndex]
       const nextNodeToFocus = getListItemByCheckbox(nextCheckbox)
       nextNodeToFocus.classList.add('treeselect-list__item--focused')
+
+      // GK
+      // Trigger tag leave event for the previously focused item
+      if (focusedCheckboxIndex !== -1 && this.onTagLeaveCallback) {
+        const checkbox = allCheckboxes[focusedCheckboxIndex] as HTMLInputElement
+        const optionId = checkbox.getAttribute('input-id')
+        if (optionId) {
+          // Convert to number to be consistent with input area
+          this.onTagLeaveCallback(Number(optionId))
+        }
+      }
+
+      // GK
+      // Trigger tag enter event for the newly focused item
+      if (this.onTagEnterCallback) {
+        const checkbox = nextCheckbox as HTMLInputElement
+        const optionId = checkbox.getAttribute('input-id')
+        if (optionId) {
+          // Convert to number to be consistent with input area
+          this.onTagEnterCallback(Number(optionId))
+        }
+      }
 
       const listCoord = this.srcElement.getBoundingClientRect()
       const nextCoord = nextNodeToFocus.getBoundingClientRect()
@@ -643,6 +672,17 @@ export class TreeselectList implements ITreeselectList {
   #itemElementMouseover(itemElement: HTMLDivElement) {
     if (this.#isMouseActionsAvailable) {
       this.#groupMouseAction(true, itemElement)
+
+      // GK
+      // Get the option id from the checkbox input
+      const checkbox = itemElement.querySelector('.treeselect-list__item-checkbox') as HTMLInputElement
+      if (checkbox && this.onTagEnterCallback) {
+        const optionId = checkbox.getAttribute('input-id')
+        if (optionId) {
+          // Convert to number to be consistent with input area
+          this.onTagEnterCallback(Number(optionId))
+        }
+      }
     }
   }
 
@@ -650,6 +690,17 @@ export class TreeselectList implements ITreeselectList {
     if (this.#isMouseActionsAvailable) {
       this.#groupMouseAction(false, itemElement)
       this.#lastFocusedItem = itemElement
+
+      // GK
+      // Get the option id from the checkbox input
+      const checkbox = itemElement.querySelector('.treeselect-list__item-checkbox') as HTMLInputElement
+      if (checkbox && this.onTagLeaveCallback) {
+        const optionId = checkbox.getAttribute('input-id')
+        if (optionId) {
+          // Convert to number to be consistent with input area
+          this.onTagLeaveCallback(Number(optionId))
+        }
+      }
     }
   }
 

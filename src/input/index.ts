@@ -1,6 +1,7 @@
 import { ValueOptionType, FlattedOptionType, IconsType } from '../treeselectTypes'
 import { ITreeselectInputParams, ITreeselectInput } from './inputTypes'
 import { appendIconToElement } from '../svgIcons'
+import { setAttributesFromHtmlAttr } from "../list" //GK
 
 const getTagsSelectedName = (value: FlattedOptionType[]) => {
   return value.reduce((acc, { name }, index) => {
@@ -49,6 +50,8 @@ export class TreeselectInput implements ITreeselectInput {
   focusCallback: () => void
   blurCallback: () => void
   nameChangeCallback: (name: string) => void
+  onTagEnterCallback: (value: string | number) => void //GK
+  onTagLeaveCallback: (value: string | number) => void //GK
 
   constructor({
     value,
@@ -70,7 +73,9 @@ export class TreeselectInput implements ITreeselectInput {
     keydownCallback,
     focusCallback,
     blurCallback,
-    nameChangeCallback
+    nameChangeCallback,
+    onTagEnterCallback,
+    onTagLeaveCallback
   }: ITreeselectInputParams) {
     this.value = value
     this.showTags = showTags
@@ -101,6 +106,8 @@ export class TreeselectInput implements ITreeselectInput {
     this.focusCallback = focusCallback
     this.blurCallback = blurCallback
     this.nameChangeCallback = nameChangeCallback
+    this.onTagEnterCallback = onTagEnterCallback
+    this.onTagLeaveCallback = onTagLeaveCallback
 
     this.srcElement = this.#createTreeselectInput(this.#htmlTagsSection, this.#htmlEditControl, this.#htmlOperators)
 
@@ -125,6 +132,7 @@ export class TreeselectInput implements ITreeselectInput {
 
   updateValue(newValue: FlattedOptionType[]) {
     this.value = newValue
+    this.#currentTagIndex = -1  // Reset current tag index when value changes
     this.#updateTags()
     this.#updateEditControl()
   }
@@ -278,11 +286,14 @@ export class TreeselectInput implements ITreeselectInput {
       element.setAttribute('tabindex', '-1')
       element.setAttribute('tag-id', value.id.toString())
       element.setAttribute('title', value.name)
+      if (value.htmlAttrStr) setAttributesFromHtmlAttr(element, JSON.parse(value.htmlAttrStr))
 
       const name = this.#createTagName(value.name)
       const cross = this.#createTagCross()
 
       element.addEventListener('mousedown', (e) => this.#tagsMousedown(e, value.id))
+      element.addEventListener('mouseenter', () => this.#tagsMouseEnter(value.id))
+      element.addEventListener('mouseleave', () => this.#tagsMouseLeave(value.id))
 
       element.append(name, cross)
 
@@ -296,6 +307,48 @@ export class TreeselectInput implements ITreeselectInput {
     e.stopPropagation()
     this.removeItem(id)
     this.focus()
+  }
+
+  #tagsMouseEnter(id: ValueOptionType) {
+    this.onTagEnterCallback(id)
+  }
+
+  #tagsMouseLeave(id: ValueOptionType) {
+    this.onTagLeaveCallback(id)
+  }
+
+  // Handle keyboard navigation between tags
+  #handleTagNavigation(key: string) {
+    if (!this.value.length || !this.showTags) return
+
+    // First leave the currently selected tag if there is one
+    if (this.#currentTagIndex >= 0 && this.#currentTagIndex < this.value.length) {
+      this.onTagLeaveCallback(this.value[this.#currentTagIndex].id)
+
+      // Remove focus styling from current tag
+      const tagElements = Array.from(this.#htmlTagsSection.querySelectorAll('.treeselect-input__tags-element'))
+      if (tagElements[this.#currentTagIndex]) {
+        tagElements[this.#currentTagIndex].classList.remove('treeselect-input__tags-element--focused')
+      }
+    }
+
+    // Calculate the new index based on arrow key direction
+    if (key === 'ArrowRight') {
+      this.#currentTagIndex = this.#currentTagIndex < this.value.length - 1 ? this.#currentTagIndex + 1 : 0
+    } else if (key === 'ArrowLeft') {
+      this.#currentTagIndex = this.#currentTagIndex > 0 ? this.#currentTagIndex - 1 : this.value.length - 1
+    }
+
+    // Trigger enter event for the newly selected tag
+    if (this.#currentTagIndex >= 0 && this.#currentTagIndex < this.value.length) {
+      this.onTagEnterCallback(this.value[this.#currentTagIndex].id)
+
+      // Add focus styling to the new tag
+      const tagElements = Array.from(this.#htmlTagsSection.querySelectorAll('.treeselect-input__tags-element'))
+      if (tagElements[this.#currentTagIndex]) {
+        tagElements[this.#currentTagIndex].classList.add('treeselect-input__tags-element--focused')
+      }
+    }
   }
 
   #createTagName(name: string) {
@@ -358,6 +411,9 @@ export class TreeselectInput implements ITreeselectInput {
     return input
   }
 
+  // Track the current tag index for keyboard navigation
+  #currentTagIndex: number = -1
+
   #controlKeydown(e: KeyboardEvent) {
     e.stopPropagation()
     const key = e.key
@@ -378,6 +434,12 @@ export class TreeselectInput implements ITreeselectInput {
     // Enter action is handled inside the keydownCallback method.
     // ArrowDown and ArrowUp were prevented to avoid cursor jumping during list navigation.
     if (key === 'Enter' || key === 'ArrowDown' || key === 'ArrowUp') {
+      e.preventDefault()
+    }
+
+    // Handle tag navigation with arrow keys if we have tags and list is not open
+    if ((key === 'ArrowRight' || key === 'ArrowLeft') && this.value.length && !this.isOpened) {
+      this.#handleTagNavigation(key)
       e.preventDefault()
     }
 

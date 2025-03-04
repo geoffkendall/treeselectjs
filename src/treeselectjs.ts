@@ -117,6 +117,8 @@ export default class Treeselect implements ITreeselect {
   nameChangeCallback: ((name: string) => void) | undefined
   searchCallback: ((value: string) => void) | undefined
   openCloseGroupCallback: ((groupId: ValueOptionType, isClosed: boolean) => void) | undefined
+  onTagEnter: ((value: ValueOptionType) => void) | undefined //GK
+  onTagLeave: ((value: ValueOptionType) => void) | undefined //GK
 
   // InnerState
   ungroupedValue: ValueOptionType[]
@@ -181,7 +183,9 @@ export default class Treeselect implements ITreeselect {
     closeCallback,
     nameChangeCallback,
     searchCallback,
-    openCloseGroupCallback
+    openCloseGroupCallback,
+    onTagEnter, //GK
+    onTagLeave  //GK
   }: ITreeselectParams) {
     validateProps({
       parentHtmlContainer,
@@ -227,6 +231,8 @@ export default class Treeselect implements ITreeselect {
     this.nameChangeCallback = nameChangeCallback
     this.searchCallback = searchCallback
     this.openCloseGroupCallback = openCloseGroupCallback
+    this.onTagEnter = onTagEnter //GK
+    this.onTagLeave = onTagLeave //GK
 
     this.ungroupedValue = []
     this.groupedValue = []
@@ -363,7 +369,9 @@ export default class Treeselect implements ITreeselect {
       iconElements: this.iconElements,
       inputCallback: (value) => this.#listInputListener(value),
       arrowClickCallback: (groupId, isClosed) => this.#listArrowClickListener(groupId, isClosed),
-      mouseupCallback: () => this.#treeselectInput?.focus()
+      mouseupCallback: () => this.#treeselectInput?.focus(),
+      onTagEnterCallback: (value) => this.#inputTagEnterListener(value), //GK
+      onTagLeaveCallback: (value) => this.#inputTagLeaveListener(value)  //GK
     })
 
     const input = new TreeselectInput({
@@ -386,7 +394,9 @@ export default class Treeselect implements ITreeselect {
       keydownCallback: (e) => this.#inputKeydownListener(e),
       focusCallback: () => this.#inputFocusListener(),
       blurCallback: () => this.#inputBlurListener(),
-      nameChangeCallback: (name) => this.#inputNameChangeListener(name)
+      nameChangeCallback: (name) => this.#inputNameChangeListener(name),
+      onTagEnterCallback: (value) => this.#inputTagEnterListener(value), //GK
+      onTagLeaveCallback: (value) => this.#inputTagLeaveListener(value)  //GK
     })
 
     if (this.appendToBody) {
@@ -760,6 +770,24 @@ export default class Treeselect implements ITreeselect {
 
     if (this.openCloseGroupCallback) {
       this.openCloseGroupCallback(groupId, isClosed)
+    }
+  }
+
+  //GK
+  #inputTagEnterListener(value: ValueOptionType) {
+    this.srcElement?.dispatchEvent(new CustomEvent('tag-enter', { detail: value }))
+
+    if (this.onTagEnter) {
+      this.onTagEnter(value)
+    }
+  }
+
+  //GK
+  #inputTagLeaveListener(value: ValueOptionType) {
+    this.srcElement?.dispatchEvent(new CustomEvent('tag-leave', { detail: value }))
+
+    if (this.onTagLeave) {
+      this.onTagLeave(value)
     }
   }
 }

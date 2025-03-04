@@ -10,7 +10,8 @@ const options = [
           {
             name: 'Chelsea',
             value: 3,
-            children: []
+            children: [],
+            htmlAttr: { title: 'Useless', style: 'color:red;' } //GK
           },
           {
             name: 'West End',
@@ -51,7 +52,13 @@ export const runDefaultExample = (Treeselect) => {
   const treeselect = new Treeselect({
     parentHtmlContainer: domElement,
     value: [4, 7, 8],
-    options: options
+    options: options,
+    onTagEnter: (value) => {
+      console.log('default: onTagEnter ', value)
+    },
+    onTagLeave: (value) => {
+      console.log('default: onTagLeave ', value)
+    }
   })
 
   treeselect.srcElement.addEventListener('input', (e) => {
