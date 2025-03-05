@@ -220,7 +220,7 @@ const getArrowOfItemByCheckbox = (checkbox: HTMLElement | Element) => {
   return arrow
 }
 
-// GK
+//GK
 export const setAttributesFromHtmlAttr = (itemElement: HTMLDivElement, htmlAttr?: object) => {
   if (!htmlAttr) {
     return
@@ -263,8 +263,8 @@ export class TreeselectList implements ITreeselectList {
   inputCallback: (value: SelectedNodesType) => void
   arrowClickCallback: (groupId: ValueOptionType, isClosed: boolean) => void
   mouseupCallback: () => void
-  onTagEnterCallback?: (value: ValueOptionType) => void //GK
-  onTagLeaveCallback?: (value: ValueOptionType) => void //GK
+  onTagEnterCallback?: (value: ValueOptionType, inList: boolean) => void //GK
+  onTagLeaveCallback?: (value: ValueOptionType, inList: boolean) => void //GK
 
   // PrivateInnerState
   #lastFocusedItem: HTMLElement | null = null
@@ -474,25 +474,25 @@ export class TreeselectList implements ITreeselectList {
       const nextNodeToFocus = getListItemByCheckbox(nextCheckbox)
       nextNodeToFocus.classList.add('treeselect-list__item--focused')
 
-      // GK
+      //GK
       // Trigger tag leave event for the previously focused item
       if (focusedCheckboxIndex !== -1 && this.onTagLeaveCallback) {
         const checkbox = allCheckboxes[focusedCheckboxIndex] as HTMLInputElement
         const optionId = checkbox.getAttribute('input-id')
         if (optionId) {
           // Convert to number to be consistent with input area
-          this.onTagLeaveCallback(Number(optionId))
+          this.onTagLeaveCallback(Number(optionId), true)
         }
       }
 
-      // GK
+      //GK
       // Trigger tag enter event for the newly focused item
       if (this.onTagEnterCallback) {
         const checkbox = nextCheckbox as HTMLInputElement
         const optionId = checkbox.getAttribute('input-id')
         if (optionId) {
           // Convert to number to be consistent with input area
-          this.onTagEnterCallback(Number(optionId))
+          this.onTagEnterCallback(Number(optionId), true)
         }
       }
 
@@ -658,7 +658,7 @@ export class TreeselectList implements ITreeselectList {
   #createItemElement(option: OptionType) {
     const itemElement = document.createElement('div')
     itemElement.setAttribute('tabindex', '-1')
-    itemElement.setAttribute('title', option.name)
+    itemElement.setAttribute('title', option.longName || option.name)
     setAttributesFromHtmlAttr(itemElement, option.htmlAttr)
     itemElement.classList.add('treeselect-list__item')
 
@@ -673,14 +673,14 @@ export class TreeselectList implements ITreeselectList {
     if (this.#isMouseActionsAvailable) {
       this.#groupMouseAction(true, itemElement)
 
-      // GK
+      //GK
       // Get the option id from the checkbox input
       const checkbox = itemElement.querySelector('.treeselect-list__item-checkbox') as HTMLInputElement
       if (checkbox && this.onTagEnterCallback) {
         const optionId = checkbox.getAttribute('input-id')
         if (optionId) {
           // Convert to number to be consistent with input area
-          this.onTagEnterCallback(Number(optionId))
+          this.onTagEnterCallback(Number(optionId), true)
         }
       }
     }
@@ -691,14 +691,14 @@ export class TreeselectList implements ITreeselectList {
       this.#groupMouseAction(false, itemElement)
       this.#lastFocusedItem = itemElement
 
-      // GK
+      //GK
       // Get the option id from the checkbox input
       const checkbox = itemElement.querySelector('.treeselect-list__item-checkbox') as HTMLInputElement
       if (checkbox && this.onTagLeaveCallback) {
         const optionId = checkbox.getAttribute('input-id')
         if (optionId) {
           // Convert to number to be consistent with input area
-          this.onTagLeaveCallback(Number(optionId))
+          this.onTagLeaveCallback(Number(optionId), true)
         }
       }
     }
@@ -755,7 +755,7 @@ export class TreeselectList implements ITreeselectList {
 
   #createCheckboxLabel(option: OptionType, isGroup: boolean) {
     const label = document.createElement('label')
-    label.textContent = option.name
+    label.textContent = option.longName || option.name
     label.classList.add('treeselect-list__item-label')
 
     if (isGroup && this.showCount) {

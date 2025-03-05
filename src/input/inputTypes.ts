@@ -21,8 +21,8 @@ export interface ITreeselectInputParams {
   focusCallback: () => void
   blurCallback: () => void
   nameChangeCallback: (name: string) => void
-  onTagEnterCallback: (value: string | number) => void //GK
-  onTagLeaveCallback: (value: string | number) => void //GK
+  onTagEnterCallback: (value: string | number, inList: boolean) => void //GK
+  onTagLeaveCallback: (value: string | number, inList: boolean) => void //GK
 }
 
 export interface ITreeselectInput extends ITreeselectInputParams {

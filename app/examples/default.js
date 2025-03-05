@@ -15,6 +15,7 @@ const options = [
           },
           {
             name: 'West End',
+            longName: 'London\'s Wonderful West End', //GK
             value: 4,
             children: []
           }
@@ -53,11 +54,11 @@ export const runDefaultExample = (Treeselect) => {
     parentHtmlContainer: domElement,
     value: [4, 7, 8],
     options: options,
-    onTagEnter: (value) => {
-      console.log('default: onTagEnter ', value)
+    onTagEnter: (value, inList) => {
+      console.log('default: onTagEnter ', value, inList)
     },
-    onTagLeave: (value) => {
-      console.log('default: onTagLeave ', value)
+    onTagLeave: (value, inList) => {
+      console.log('default: onTagLeave ', value, inList)
     }
   })
 

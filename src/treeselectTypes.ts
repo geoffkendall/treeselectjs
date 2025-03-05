@@ -7,6 +7,7 @@ export type ValueInputType = ValueOptionType[] | ValueOptionType | null | undefi
 export type OptionType = {
   value: ValueOptionType
   name: string
+  longName?: string
   disabled?: boolean
   htmlAttr?: object
   children: OptionType[]
@@ -58,8 +59,8 @@ export interface ITreeselect {
   nameChangeCallback: ((name: string) => void) | undefined
   searchCallback: ((value: string) => void) | undefined
   openCloseGroupCallback: ((groupId: ValueOptionType, isClosed: boolean) => void) | undefined
-  onTagEnter: ((value: ValueOptionType) => void) | undefined //GK
-  onTagLeave: ((value: ValueOptionType) => void) | undefined //GK
+  onTagEnter: ((value: ValueOptionType, inList: boolean) => void) | undefined //GK
+  onTagLeave: ((value: ValueOptionType, inList: boolean) => void) | undefined //GK
   mount: () => void
   updateValue: (newValue: ValueInputType) => void
   destroy: () => void
@@ -104,13 +105,14 @@ export interface ITreeselectParams {
   nameChangeCallback?: (name: string) => void
   searchCallback?: (value: string) => void
   openCloseGroupCallback?: (groupId: ValueOptionType, isClosed: boolean) => void
-  onTagEnter?: (value: ValueOptionType) => void //GK
-  onTagLeave?: (value: ValueOptionType) => void //GK
+  onTagEnter?: (value: ValueOptionType, inList: boolean) => void //GK
+  onTagLeave?: (value: ValueOptionType, inList: boolean) => void //GK
 }
 
 export type FlattedOptionType = {
   id: string | number
   name: string
+  longName?: string
   childOf: string | number
   isGroup: boolean
   checked: boolean

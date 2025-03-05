@@ -25,8 +25,8 @@ export interface ITreeselectListParams {
   inputCallback: (value: SelectedNodesType) => void
   arrowClickCallback: (groupId: ValueOptionType, isClosed: boolean) => void
   mouseupCallback: () => void
-  onTagEnterCallback?: (value: ValueOptionType) => void // GK
-  onTagLeaveCallback?: (value: ValueOptionType) => void // GK
+  onTagEnterCallback?: (value: ValueOptionType, inList: boolean) => void //GK
+  onTagLeaveCallback?: (value: ValueOptionType, inList: boolean) => void //GK
 }
 
 export interface ITreeselectList extends ITreeselectListParams {

@@ -50,8 +50,8 @@ export class TreeselectInput implements ITreeselectInput {
   focusCallback: () => void
   blurCallback: () => void
   nameChangeCallback: (name: string) => void
-  onTagEnterCallback: (value: string | number) => void //GK
-  onTagLeaveCallback: (value: string | number) => void //GK
+  onTagEnterCallback: (value: string | number, inList: boolean) => void //GK
+  onTagLeaveCallback: (value: string | number, inList: boolean) => void //GK
 
   constructor({
     value,
@@ -285,7 +285,7 @@ export class TreeselectInput implements ITreeselectInput {
       element.classList.add('treeselect-input__tags-element')
       element.setAttribute('tabindex', '-1')
       element.setAttribute('tag-id', value.id.toString())
-      element.setAttribute('title', value.name)
+      element.setAttribute('title', value.longName || value.name)
       if (value.htmlAttrStr) setAttributesFromHtmlAttr(element, JSON.parse(value.htmlAttrStr))
 
       const name = this.#createTagName(value.name)
@@ -310,11 +310,11 @@ export class TreeselectInput implements ITreeselectInput {
   }
 
   #tagsMouseEnter(id: ValueOptionType) {
-    this.onTagEnterCallback(id)
+    this.onTagEnterCallback(id, false)
   }
 
   #tagsMouseLeave(id: ValueOptionType) {
-    this.onTagLeaveCallback(id)
+    this.onTagLeaveCallback(id, false)
   }
 
   // Handle keyboard navigation between tags
@@ -323,7 +323,7 @@ export class TreeselectInput implements ITreeselectInput {
 
     // First leave the currently selected tag if there is one
     if (this.#currentTagIndex >= 0 && this.#currentTagIndex < this.value.length) {
-      this.onTagLeaveCallback(this.value[this.#currentTagIndex].id)
+      this.onTagLeaveCallback(this.value[this.#currentTagIndex].id, false)
 
       // Remove focus styling from current tag
       const tagElements = Array.from(this.#htmlTagsSection.querySelectorAll('.treeselect-input__tags-element'))
@@ -341,7 +341,7 @@ export class TreeselectInput implements ITreeselectInput {
 
     // Trigger enter event for the newly selected tag
     if (this.#currentTagIndex >= 0 && this.#currentTagIndex < this.value.length) {
-      this.onTagEnterCallback(this.value[this.#currentTagIndex].id)
+      this.onTagEnterCallback(this.value[this.#currentTagIndex].id, false)
 
       // Add focus styling to the new tag
       const tagElements = Array.from(this.#htmlTagsSection.querySelectorAll('.treeselect-input__tags-element'))

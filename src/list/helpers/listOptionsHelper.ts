@@ -14,11 +14,12 @@ const getInitFlattedOptions = (options: OptionType[], openLevel: number, groupId
     const isGroup = !!curr.children?.length
     const isClosed = level >= openLevel && isGroup
     const hidden = level > openLevel
-    const htmlAttrStr = curr.htmlAttr ? JSON.stringify(curr.htmlAttr) : '' // GK
+    const htmlAttrStr = curr.htmlAttr ? JSON.stringify(curr.htmlAttr) : '' //GK
 
     acc.push({
       id: curr.value,
       name: curr.name,
+      longName: curr.longName,
       childOf: groupId,
       isGroup,
       checked: false,

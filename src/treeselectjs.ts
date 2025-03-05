@@ -117,8 +117,8 @@ export default class Treeselect implements ITreeselect {
   nameChangeCallback: ((name: string) => void) | undefined
   searchCallback: ((value: string) => void) | undefined
   openCloseGroupCallback: ((groupId: ValueOptionType, isClosed: boolean) => void) | undefined
-  onTagEnter: ((value: ValueOptionType) => void) | undefined //GK
-  onTagLeave: ((value: ValueOptionType) => void) | undefined //GK
+  onTagEnter: ((value: ValueOptionType, inList: boolean) => void) | undefined //GK
+  onTagLeave: ((value: ValueOptionType, inList: boolean) => void) | undefined //GK
 
   // InnerState
   ungroupedValue: ValueOptionType[]
@@ -370,8 +370,8 @@ export default class Treeselect implements ITreeselect {
       inputCallback: (value) => this.#listInputListener(value),
       arrowClickCallback: (groupId, isClosed) => this.#listArrowClickListener(groupId, isClosed),
       mouseupCallback: () => this.#treeselectInput?.focus(),
-      onTagEnterCallback: (value) => this.#inputTagEnterListener(value), //GK
-      onTagLeaveCallback: (value) => this.#inputTagLeaveListener(value)  //GK
+      onTagEnterCallback: (value, inList) => this.#inputTagEnterListener(value, inList), //GK
+      onTagLeaveCallback: (value, inList) => this.#inputTagLeaveListener(value, inList)  //GK
     })
 
     const input = new TreeselectInput({
@@ -395,8 +395,8 @@ export default class Treeselect implements ITreeselect {
       focusCallback: () => this.#inputFocusListener(),
       blurCallback: () => this.#inputBlurListener(),
       nameChangeCallback: (name) => this.#inputNameChangeListener(name),
-      onTagEnterCallback: (value) => this.#inputTagEnterListener(value), //GK
-      onTagLeaveCallback: (value) => this.#inputTagLeaveListener(value)  //GK
+      onTagEnterCallback: (value, inList) => this.#inputTagEnterListener(value, inList), //GK
+      onTagLeaveCallback: (value, inList) => this.#inputTagLeaveListener(value, inList)  //GK
     })
 
     if (this.appendToBody) {
@@ -774,20 +774,20 @@ export default class Treeselect implements ITreeselect {
   }
 
   //GK
-  #inputTagEnterListener(value: ValueOptionType) {
-    this.srcElement?.dispatchEvent(new CustomEvent('tag-enter', { detail: value }))
+  #inputTagEnterListener(value: ValueOptionType, inList: boolean) {
+    this.srcElement?.dispatchEvent(new CustomEvent('tag-enter', { detail: { value, inList } }))
 
     if (this.onTagEnter) {
-      this.onTagEnter(value)
+      this.onTagEnter(value, inList)
     }
   }
 
   //GK
-  #inputTagLeaveListener(value: ValueOptionType) {
-    this.srcElement?.dispatchEvent(new CustomEvent('tag-leave', { detail: value }))
+  #inputTagLeaveListener(value: ValueOptionType, inList: boolean) {
+    this.srcElement?.dispatchEvent(new CustomEvent('tag-leave', { detail: { value, inList } }))
 
     if (this.onTagLeave) {
-      this.onTagLeave(value)
+      this.onTagLeave(value, inList)
     }
   }
 }
