@@ -480,8 +480,8 @@ export class TreeselectList implements ITreeselectList {
         const checkbox = allCheckboxes[focusedCheckboxIndex] as HTMLInputElement
         const optionId = checkbox.getAttribute('input-id')
         if (optionId) {
-          // Convert to number to be consistent with input area
-          this.onTagLeaveCallback(Number(optionId), true)
+          // Pass the optionId as is without conversion
+          this.onTagLeaveCallback(optionId, true)
         }
       }
 
@@ -491,8 +491,8 @@ export class TreeselectList implements ITreeselectList {
         const checkbox = nextCheckbox as HTMLInputElement
         const optionId = checkbox.getAttribute('input-id')
         if (optionId) {
-          // Convert to number to be consistent with input area
-          this.onTagEnterCallback(Number(optionId), true)
+          // Pass the optionId as is without conversion
+          this.onTagEnterCallback(optionId, true)
         }
       }
 
@@ -679,8 +679,8 @@ export class TreeselectList implements ITreeselectList {
       if (checkbox && this.onTagEnterCallback) {
         const optionId = checkbox.getAttribute('input-id')
         if (optionId) {
-          // Convert to number to be consistent with input area
-          this.onTagEnterCallback(Number(optionId), true)
+          // Pass the optionId as is without conversion
+          this.onTagEnterCallback(optionId, true)
         }
       }
     }
@@ -697,8 +697,8 @@ export class TreeselectList implements ITreeselectList {
       if (checkbox && this.onTagLeaveCallback) {
         const optionId = checkbox.getAttribute('input-id')
         if (optionId) {
-          // Convert to number to be consistent with input area
-          this.onTagLeaveCallback(Number(optionId), true)
+          // Pass the optionId as is without conversion
+          this.onTagLeaveCallback(optionId, true)
         }
       }
     }

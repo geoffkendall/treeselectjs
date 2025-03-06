@@ -5,7 +5,7 @@ const options = [
     children: [
       {
         name: 'London',
-        value: 2,
+        value: 'Text 2',
         children: [
           {
             name: 'Chelsea',
@@ -16,7 +16,7 @@ const options = [
           {
             name: 'West End',
             longName: 'London\'s Wonderful West End', //GK
-            value: 4,
+            value: 'Text 4',
             children: []
           }
         ]
@@ -30,7 +30,7 @@ const options = [
   },
   {
     name: 'France',
-    value: 6,
+    value: 'Text 6',
     children: [
       {
         name: 'Paris',
