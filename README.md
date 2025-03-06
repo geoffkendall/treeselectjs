@@ -155,6 +155,7 @@ Name  | Type (default) | Description
 **searchable**  | Boolean (true) | Search is available.
 **placeholder**  | String ('Search...') | Placeholder text.
 **grouped** | Boolean (true) | Show groups in the input and group leafs if all group selected.
+**useTitle** | Boolean (false) | When true, displays tooltips (title attributes) on tags and list items. Set to false to disable tooltips.
 
 #### Callback props
 Check [Emits](#Emits) section for more info.
@@ -167,6 +168,8 @@ Name  | Type (default) | Description
 **nameChangeCallback** | (name) => void (undefined) | Callback method for `name-change` if you don't want to use eventListener.
 **searchCallback** | (value) => void (undefined) | Callback method for `search` if you don't want to use eventListener.
 **openCloseGroupCallback** | (groupId: ValueOptionType, isClosed: boolean) => void (undefined) | Callback method for `open-close-group` if you don't want to use eventListener.
+**onTagEnter** | (value: ValueOptionType, inList: boolean) => void (undefined) | Callback method triggered when the mouse enters a tag in the input or list. The `inList` parameter indicates whether the tag is in the list (true) or in the input area (false).
+**onTagLeave** | (value: ValueOptionType, inList: boolean) => void (undefined) | Callback method triggered when the mouse leaves a tag in the input or list. The `inList` parameter indicates whether the tag is in the list (true) or in the input area (false).
 
 #### Additional props
 Name  | Type (default) | Description
@@ -197,6 +200,8 @@ Name  | Return Type | Description
 **name-change**  | String | Returns selected name inside the input, action is triggered on on change the list. Add `eventListener` or use `nameChangeCallback` prop to get name.
 **search**  | String | Returns entered search value, action is triggered on change search value during the typing. Add `eventListener` or use `searchCallback` prop to get value. You can try create something like autocomplete with help of this event.
 **open-close-group**  | { groupId: [String \| Number], isClosed: Boolean } | Returns groupId and closed/open status of this group, action is triggered on open/close group in the list. Add `eventListener` or use `openCloseGroupCallback` prop to get value.
+**tag-enter** | { value: [String \| Number], inList: Boolean } | Triggered when the mouse enters a tag in the input or list. The `inList` parameter indicates whether the tag is in the list (true) or in the input area (false). Add `eventListener` or use `onTagEnter` prop to handle this event.
+**tag-leave** | { value: [String \| Number], inList: Boolean } | Triggered when the mouse leaves a tag in the input or list. The `inList` parameter indicates whether the tag is in the list (true) or in the input area (false). Add `eventListener` or use `onTagLeave` prop to handle this event.
 
 ---
 

@@ -41,6 +41,7 @@ export interface ITreeselect {
   id: string
   ariaLabel: string
   isSingleSelect: boolean
+  useTitle: boolean //GK
   showCount: boolean
   disabledBranchNode: boolean
   direction: DirectionType
@@ -91,6 +92,7 @@ export interface ITreeselectParams {
   id?: string
   ariaLabel?: string
   isSingleSelect?: boolean
+  useTitle?: boolean //GK
   showCount?: boolean
   disabledBranchNode?: boolean
   direction?: DirectionType

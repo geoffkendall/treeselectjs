@@ -26,6 +26,7 @@ export class TreeselectInput implements ITreeselectInput {
   placeholder: string
   disabled: boolean
   isSingleSelect: boolean
+  useTitle: boolean //GK
   id: string
   ariaLabel: string
   iconElements: IconsType
@@ -63,6 +64,7 @@ export class TreeselectInput implements ITreeselectInput {
     placeholder,
     disabled,
     isSingleSelect,
+    useTitle, //GK
     id,
     ariaLabel,
     iconElements,
@@ -86,6 +88,7 @@ export class TreeselectInput implements ITreeselectInput {
     this.isAlwaysOpened = isAlwaysOpened
     this.disabled = disabled
     this.isSingleSelect = isSingleSelect
+    this.useTitle = useTitle ?? false //GK
     this.id = id
     this.ariaLabel = ariaLabel
     this.iconElements = iconElements
@@ -285,7 +288,9 @@ export class TreeselectInput implements ITreeselectInput {
       element.classList.add('treeselect-input__tags-element')
       element.setAttribute('tabindex', '-1')
       element.setAttribute('tag-id', value.id.toString())
-      element.setAttribute('title', value.longName || value.name)
+      if (this.useTitle) { //GK
+        element.setAttribute('title', value.longName || value.name)
+      }
       if (value.htmlAttrStr) setAttributesFromHtmlAttr(element, JSON.parse(value.htmlAttrStr)) //GK
 
       const name = this.#createTagName(value.name)
@@ -373,14 +378,18 @@ export class TreeselectInput implements ITreeselectInput {
 
     if (!this.value.length) {
       countEl.textContent = ''
-      countEl.setAttribute('title', '')
+      if (this.useTitle) { //GK
+        countEl.setAttribute('title', '')
+      }
 
       return countEl
     }
 
     const count = this.value.length === 1 ? this.value[0].name : `${this.value.length} ${this.tagsCountText}`
     countEl.textContent = count
-    countEl.setAttribute('title', count)
+    if (this.useTitle) { //GK
+      countEl.setAttribute('title', count)
+    }
 
     return countEl
   }

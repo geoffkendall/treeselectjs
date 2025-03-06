@@ -102,6 +102,7 @@ export default class Treeselect implements ITreeselect {
   id: string
   ariaLabel: string
   isSingleSelect: boolean
+  useTitle: boolean //GK
   showCount: boolean
   disabledBranchNode: boolean
   direction: DirectionType
@@ -169,6 +170,7 @@ export default class Treeselect implements ITreeselect {
     id,
     ariaLabel,
     isSingleSelect,
+    useTitle, //GK
     showCount,
     disabledBranchNode,
     direction,
@@ -216,6 +218,7 @@ export default class Treeselect implements ITreeselect {
     this.id = id ?? ''
     this.ariaLabel = ariaLabel ?? ''
     this.isSingleSelect = isSingleSelect ?? false
+    this.useTitle = useTitle ?? false
     this.showCount = showCount ?? false
     this.disabledBranchNode = disabledBranchNode ?? false
     this.direction = direction ?? 'auto'
@@ -360,6 +363,7 @@ export default class Treeselect implements ITreeselect {
       tagsSortFn: this.tagsSortFn,
       emptyText: this.emptyText,
       isSingleSelect: this.isSingleSelect,
+      useTitle: this.useTitle,
       showCount: this.showCount,
       disabledBranchNode: this.disabledBranchNode,
       expandSelected: this.expandSelected,
@@ -384,6 +388,7 @@ export default class Treeselect implements ITreeselect {
       placeholder: this.placeholder,
       disabled: this.disabled,
       isSingleSelect: this.isSingleSelect,
+      useTitle: this.useTitle,
       id: this.id,
       ariaLabel: this.ariaLabel,
       iconElements: this.iconElements,

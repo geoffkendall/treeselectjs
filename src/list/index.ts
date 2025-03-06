@@ -244,6 +244,7 @@ export class TreeselectList implements ITreeselectList {
   tagsSortFn: TagsSortFnType
   emptyText: string
   isSingleSelect: boolean
+  useTitle: boolean //GK
   showCount: boolean
   disabledBranchNode: boolean
   expandSelected: boolean
@@ -280,6 +281,7 @@ export class TreeselectList implements ITreeselectList {
     tagsSortFn,
     emptyText,
     isSingleSelect,
+    useTitle, //GK
     iconElements,
     showCount,
     disabledBranchNode,
@@ -300,6 +302,7 @@ export class TreeselectList implements ITreeselectList {
     this.tagsSortFn = tagsSortFn ?? null
     this.emptyText = emptyText ?? 'No results found...'
     this.isSingleSelect = isSingleSelect ?? false
+    this.useTitle = useTitle ?? false //GK
     this.showCount = showCount ?? false
     this.disabledBranchNode = disabledBranchNode ?? false
     this.expandSelected = expandSelected ?? false
@@ -613,7 +616,9 @@ export class TreeselectList implements ITreeselectList {
   #createEmptyList() {
     const emptyList = document.createElement('div')
     emptyList.classList.add('treeselect-list__empty')
-    emptyList.setAttribute('title', this.emptyText)
+    if (this.useTitle) { //GK
+      emptyList.setAttribute('title', this.emptyText)
+    }
 
     const icon = document.createElement('span')
     icon.classList.add('treeselect-list__empty-icon')
@@ -658,7 +663,9 @@ export class TreeselectList implements ITreeselectList {
   #createItemElement(option: OptionType) {
     const itemElement = document.createElement('div')
     itemElement.setAttribute('tabindex', '-1')
-    itemElement.setAttribute('title', option.longName || option.name)
+    if (this.useTitle) { //GK
+      itemElement.setAttribute('title', option.longName || option.name)
+    }
     setAttributesFromHtmlAttr(itemElement, option.htmlAttr)
     itemElement.classList.add('treeselect-list__item')
 
@@ -757,7 +764,9 @@ export class TreeselectList implements ITreeselectList {
     const label = document.createElement('label')
     label.textContent = option.longName || option.name
     label.classList.add('treeselect-list__item-label')
-    label.setAttribute('title', option.longName || option.name)
+    if (this.useTitle) { //GK
+      label.setAttribute('title', option.longName || option.name)
+    }
     if (isGroup && this.showCount) {
       const counter = this.#createCounter(option)
       label.appendChild(counter)

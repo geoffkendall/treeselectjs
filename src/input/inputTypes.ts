@@ -10,6 +10,7 @@ export interface ITreeselectInputParams {
   placeholder: string
   disabled: boolean
   isSingleSelect: boolean
+  useTitle: boolean //GK
   id: string
   ariaLabel: string
   iconElements: IconsType

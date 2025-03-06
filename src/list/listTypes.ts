@@ -15,6 +15,7 @@ export interface ITreeselectListParams {
   tagsSortFn: TagsSortFnType
   emptyText: string
   isSingleSelect: boolean
+  useTitle?: boolean //GK
   showCount: boolean
   disabledBranchNode: boolean
   expandSelected: boolean
