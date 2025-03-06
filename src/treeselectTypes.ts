@@ -10,6 +10,7 @@ export type OptionType = {
   longName?: string
   disabled?: boolean
   htmlAttr?: object
+  isSingleSelect?: boolean
   children: OptionType[]
 }
 
@@ -121,6 +122,7 @@ export type FlattedOptionType = {
   isClosed: boolean
   hidden: boolean
   disabled: boolean
+  isSingleSelect?: boolean
   htmlAttrStr: string //GK
 }
 

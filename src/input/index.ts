@@ -286,7 +286,7 @@ export class TreeselectInput implements ITreeselectInput {
       element.setAttribute('tabindex', '-1')
       element.setAttribute('tag-id', value.id.toString())
       element.setAttribute('title', value.longName || value.name)
-      if (value.htmlAttrStr) setAttributesFromHtmlAttr(element, JSON.parse(value.htmlAttrStr))
+      if (value.htmlAttrStr) setAttributesFromHtmlAttr(element, JSON.parse(value.htmlAttrStr)) //GK
 
       const name = this.#createTagName(value.name)
       const cross = this.#createTagCross()

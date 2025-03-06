@@ -124,7 +124,7 @@ Name  | Type (default) | Description
 **disabled** | Boolean (false) | List will be disabled.
 **id** | String ('') | id attribute for the accessibility.
 **ariaLabel** | String ('') | ariaLabel attribute for the accessibility.
-**isSingleSelect** | Boolean (false) | Converts multi-select to the single value select. Checkboxes will be removed. You should pass only one id instead of array of values. Also you can set **showTags** to false. It helps to show treeselect as a dropdown.
+**isSingleSelect** | Boolean (false) | Converts multi-select to the single value select. Checkboxes will be removed. You should pass only one id instead of array of values. Also you can set **showTags** to false. It helps to show treeselect as a dropdown. See also the per-node `isSingleSelect` property in the [Option description](#option-description) section, which provides more granular control by allowing single-select behavior at the node level.
 **isGroupedValue** | Boolean (false) | Return groups if they selected instead of separate ids. Treeselect returns only leaves ids by default.
 **isIndependentNodes** | Boolean (false) | All nodes in treeselect work as an independent entity. Check/uncheck action ignore children/parent updates workflow. Disabled nodes ignore children/parent workflow as well.
 **rtl** | Boolean (false) | RTL mode.
@@ -182,8 +182,9 @@ Name  | Type | Description
 **value** | String \| Number (required!) | It is a value of the node. **It should be unique!**
 **name** | String (required!) | It is the name of the node. **Can be duplicated.**
 **disabled** | Boolean (optional) | The node will be disabled. It is an optional field, you can skip it if no need to work with disabled values.
+**isSingleSelect** | Boolean (optional) | When set to true on a node, only one child of this node can be selected at a time. This allows for per-node single selection criteria, which means if the tree has multiple branches with `isSingleSelect` set on each branch (but not on the whole tree), it would be possible to select one node from each branch.
 **htmlAttr** | Object (optional) | The object of the HTML attributes, the value of the object should be a String type. These attributes will be merged into the node HTML tag.
-**children** | {name: String, value: String, disabled?: Boolean, htmlAttr?: object, children: [] }[] | Children are the same array of objects.
+**children** | {name: String, value: String, disabled?: Boolean, isSingleSelect?: Boolean, htmlAttr?: object, children: [] }[] | Children are the same array of objects.
 
 ---
 

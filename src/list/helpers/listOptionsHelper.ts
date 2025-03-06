@@ -28,7 +28,8 @@ const getInitFlattedOptions = (options: OptionType[], openLevel: number, groupId
       isClosed,
       hidden,
       disabled: curr.disabled ?? false,
-      htmlAttrStr: htmlAttrStr //GK
+      isSingleSelect: curr.isSingleSelect,
+      htmlAttrStr //GK
     })
 
     if (isGroup) {

@@ -2,6 +2,7 @@ const options = [
   {
     name: 'England',
     value: 1,
+    isSingleSelect: true, // Only one child of England can be selected at a time
     children: [
       {
         name: 'London',
@@ -14,6 +15,7 @@ const options = [
           },
           {
             name: 'West End',
+            longName: 'London\'s Wonderful West End',
             value: 'Text 4',
             children: []
           }
@@ -29,6 +31,7 @@ const options = [
   {
     name: 'France',
     value: 'Text 6',
+    isSingleSelect: true, // Only one child of France can be selected at a time
     children: [
       {
         name: 'Paris',
@@ -44,23 +47,25 @@ const options = [
   }
 ]
 
-const className = '.treeselect-demo-default'
+const className = '.treeselect-demo-per-node-single-select'
 
-export const runDefaultExample = (Treeselect) => {
+export const runPerNodeSingleSelectExample = (Treeselect) => {
   const domElement = document.querySelector(className)
   const treeselect = new Treeselect({
     parentHtmlContainer: domElement,
-    value: [4, 7, 8],
+    value: [3, 7], // Select one item in each branch
     options: options,
+    // disabledBranchNode: true,
+    // Not setting global isSingleSelect here, since we want to allow selecting from multiple top-level branches
     onTagEnter: (value, inList) => {
-      console.log('default: onTagEnter ', value, inList)
+      console.log('per-node-single-select: onTagEnter ', value, inList)
     },
     onTagLeave: (value, inList) => {
-      console.log('default: onTagLeave ', value, inList)
+      console.log('per-node-single-select: onTagLeave ', value, inList)
     }
   })
 
   treeselect.srcElement.addEventListener('input', (e) => {
-    console.log('default: Selected value ', e.detail)
+    console.log('per-node-single-select: Selected value ', e.detail)
   })
 }

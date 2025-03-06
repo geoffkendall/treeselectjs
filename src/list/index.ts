@@ -8,7 +8,7 @@ import {
 } from '../treeselectTypes'
 import { ITreeselectListParams, ITreeselectList } from './listTypes'
 import { getFlattedOptions, getCheckedOptions } from './helpers/listOptionsHelper'
-import { updateOptionByCheckState, updateOptionsByValue } from './helpers/listCheckStateHelper'
+import { updateOptionByCheckState, updateOptionsByValue, forceUpdateAllAncestorStates } from './helpers/listCheckStateHelper'
 import {
   hideShowChildrenOptions,
   updateVisibleBySearchFlattedOptions,
@@ -713,7 +713,7 @@ export class TreeselectList implements ITreeselectList {
       return
     }
 
-    const checkbox = (e.target as HTMLElement).querySelector('.treeselect-list__item-checkbox') as HTMLInputElement
+    const checkbox = (e.target as HTMLElement)?.querySelector('.treeselect-list__item-checkbox') as HTMLInputElement
     checkbox.checked = !checkbox.checked
     this.#checkboxClickEvent(checkbox, option)
   }
@@ -757,7 +757,7 @@ export class TreeselectList implements ITreeselectList {
     const label = document.createElement('label')
     label.textContent = option.longName || option.name
     label.classList.add('treeselect-list__item-label')
-
+    label.setAttribute('title', option.longName || option.name)
     if (isGroup && this.showCount) {
       const counter = this.#createCounter(option)
       label.appendChild(counter)
@@ -790,22 +790,131 @@ export class TreeselectList implements ITreeselectList {
       return
     }
 
+    // Don't proceed if we're trying to uncheck something
+    if (!target.checked) {
+      flattedOption.checked = false
+      updateOptionByCheckState(flattedOption, this.flattedOptions, this.isIndependentNodes)
+      updateDOM(this.flattedOptions, this.srcElement, this.iconElements, this.#previousSingleSelectedValue, this.rtl)
+      this.#emitInput()
+      return
+    }
+
+    // Handle global isSingleSelect setting first
     if (this.isSingleSelect) {
       const [previousValue] = this.#previousSingleSelectedValue
 
-      // Prevent emit the same value.
+      // Prevent emitting the same value
       if (flattedOption.id === previousValue) {
         return
       }
 
       this.#previousSingleSelectedValue = [flattedOption.id]
       updateOptionsByValue([flattedOption.id], this.flattedOptions, this.isSingleSelect, this.isIndependentNodes)
-    } else {
-      flattedOption.checked = target.checked
-      const resultChecked = updateOptionByCheckState(flattedOption, this.flattedOptions, this.isIndependentNodes)
-      target.checked = resultChecked
+      updateDOM(this.flattedOptions, this.srcElement, this.iconElements, this.#previousSingleSelectedValue, this.rtl)
+      this.#emitInput()
+      return
     }
 
+    // If independent nodes mode is on, we don't need to do any of the single select logic
+    if (this.isIndependentNodes) {
+      // Simply check/uncheck the current option and emit input event
+      flattedOption.checked = true
+      const resultChecked = updateOptionByCheckState(flattedOption, this.flattedOptions, this.isIndependentNodes)
+      target.checked = resultChecked
+      updateDOM(this.flattedOptions, this.srcElement, this.iconElements, this.#previousSingleSelectedValue, this.rtl)
+      this.#emitInput()
+      return
+    }
+
+    // We're in multi-select mode but checking a node, so handle per-node isSingleSelect
+
+    // Build a path from the current node to the root to identify ancestors and descendants to preserve
+    const pathToRoot = new Set<ValueOptionType>()
+    let currentNode = flattedOption
+    while (currentNode) {
+      pathToRoot.add(currentNode.id)
+      if (currentNode.childOf) {
+        const parent = this.flattedOptions.find(fo => fo.id === currentNode.childOf)
+        if (parent) {
+          currentNode = parent
+        } else {
+          break
+        }
+      } else {
+        break
+      }
+    }
+
+    // Check all ancestors for isSingleSelect
+    const ancestors = []
+    currentNode = flattedOption
+    while (currentNode?.childOf) {
+      const parent = this.flattedOptions.find(fo => fo.id === currentNode.childOf)
+      if (parent) {
+        ancestors.push(parent)
+        currentNode = parent
+      } else {
+        break
+      }
+    }
+
+    // For each ancestor with isSingleSelect, uncheck all other descendants
+    ancestors.forEach(ancestor => {
+      if (ancestor.isSingleSelect) {
+        // Find all descendants of this ancestor
+        const findDescendants = (node: FlattedOptionType): FlattedOptionType[] => {
+          const result: FlattedOptionType[] = []
+          const children = this.flattedOptions.filter(fo => fo.childOf === node.id)
+          result.push(...children)
+          children.forEach(child => {
+            result.push(...findDescendants(child))
+          })
+          return result
+        }
+
+        const allDescendants = findDescendants(ancestor)
+
+        // Uncheck all descendants not in the path to the current node
+        allDescendants.forEach(descendant => {
+          if (!pathToRoot.has(descendant.id) && descendant.checked) {
+            descendant.checked = false
+            descendant.isPartialChecked = false
+          }
+        })
+      }
+    })
+
+    // Handle current node's isSingleSelect if it's a group
+    if (flattedOption.isSingleSelect && flattedOption.isGroup) {
+      // Uncheck all currently checked descendants
+      const findDescendants = (node: FlattedOptionType): FlattedOptionType[] => {
+        const result: FlattedOptionType[] = []
+        const children = this.flattedOptions.filter(fo => fo.childOf === node.id)
+        result.push(...children)
+        children.forEach(child => {
+          result.push(...findDescendants(child))
+        })
+        return result
+      }
+
+      const descendants = findDescendants(flattedOption)
+      descendants.forEach(descendant => {
+        if (descendant.checked) {
+          descendant.checked = false
+          descendant.isPartialChecked = false
+        }
+      })
+    }
+
+    // Finally, check the current option
+    flattedOption.checked = true
+    const resultChecked = updateOptionByCheckState(flattedOption, this.flattedOptions, this.isIndependentNodes)
+    target.checked = resultChecked
+
+    // Force update all ancestor states to fix any inconsistent partial checked states
+    forceUpdateAllAncestorStates(this.flattedOptions)
+
+    // Update the DOM and emit input event
     updateDOM(this.flattedOptions, this.srcElement, this.iconElements, this.#previousSingleSelectedValue, this.rtl)
     this.#emitInput()
   }
